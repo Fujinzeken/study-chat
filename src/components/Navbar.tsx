@@ -2,6 +2,8 @@ import React from "react";
 import { MaxWidthWrapper } from "./MaxWidthWrapper";
 import Link from "next/link";
 import { Button, buttonVariants } from "./ui/button";
+import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server";
+import { ArrowRight } from "lucide-react";
 
 const Navbar = () => {
   return (
@@ -20,6 +22,18 @@ const Navbar = () => {
                 Pricing
               </Button>
             </Link>
+            <LoginLink>
+              {" "}
+              <Button size="sm" variant="ghost">
+                Sign in
+              </Button>
+            </LoginLink>
+            <RegisterLink>
+              {" "}
+              <Button size="sm">
+                Get Started <ArrowRight className="ml-1.5" />
+              </Button>
+            </RegisterLink>
           </div>
         </div>
       </MaxWidthWrapper>
