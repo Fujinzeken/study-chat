@@ -8,7 +8,8 @@ export const GET = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
-    
+    console.log(user?.id);
+
     if (!user) {
       return NextResponse.json({
         status: 401,
@@ -22,7 +23,7 @@ export const GET = async (req: NextApiRequest, res: NextApiResponse) => {
     });
     return NextResponse.json({
       status: 200,
-     data:result,
+      data: result,
     });
   } catch (err: any) {
     console.error("An error occurred:", err);

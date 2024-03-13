@@ -3,16 +3,33 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { redirect } from "next/navigation";
 import UploadButton from "@/components/UploadButton";
-import { Ghost, MessageSquare, Plus, Trash } from "lucide-react";
+import { Ghost, Loader2, MessageSquare, Plus, Trash } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 const DashboardPage = () => {
   const [files, setFiles] = useState([]);
+  const [fileToDelete, setFileToDelete] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
+  const handleDelete = async (id: string) => {
+    setFileToDelete(id);
+    try {
+      const res = await axios.delete("http://localhost:3000/api/files/delete", {
+        //@ts-ignore
+        fileId: id,
+      });
+      getUserFiles();
+      setIsLoading(false);
+      setFileToDelete("");
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
+  };
   const getUserFiles = async () => {
     setIsLoading(true);
     try {
@@ -29,7 +46,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    getUserFiles();
+    // getUserFiles();
   }, []);
   return (
     <main className="mx-auto max-w-7xl md:p-10">
@@ -41,7 +58,7 @@ const DashboardPage = () => {
       {isLoading && (
         <Skeleton height={50} className="my-2" count={3}></Skeleton>
       )}
-      {!isLoading && files.length > 0 ? (
+      {files?.length > 0 ? (
         <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3">
           {files
             .sort(
@@ -54,8 +71,13 @@ const DashboardPage = () => {
             .map((file: any) => (
               <li
                 key={file?.id}
-                className="cols-span-1 bg-white divide-y divide-gray-200 rounded-lg shadow transition hover:shadow-lg"
+                className="relative cols-span-1 bg-white divide-y divide-gray-200 rounded-lg shadow transition hover:shadow-lg"
               >
+                {fileToDelete === file.id && (
+                  <div className="w-full h-full bg-black opacity-40 justify-center items-center flex z-50 absolute top-0 left-0">
+                    <Loader2 className="h-14 w-14 animate-spin" color="blue" />
+                  </div>
+                )}
                 <Link href={`/dashboard/${file?.id}`} className="">
                   <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
                     <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
@@ -71,13 +93,18 @@ const DashboardPage = () => {
                 <div className="px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500">
                   <div className="flex items-center gap-2">
                     <Plus className="h-4 w-4 " />
-                    {format(new Date(file.createdAt), "MMM yyyy")}
+                    {format(new Date(file?.createdAt), "MMM yyyy")}
                   </div>
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
                     Mocked
                   </div>
-                  <Button size="sm" className="w-full" variant="destructive">
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    variant="destructive"
+                    onClick={() => handleDelete(file?.id)}
+                  >
                     <Trash className="h-4 w-4" />
                   </Button>
                 </div>
