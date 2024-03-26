@@ -5,11 +5,17 @@ import { Button } from "./ui/button";
 import Dropzone from "react-dropzone";
 import { Cloud, File } from "lucide-react";
 import { Progress } from "./ui/progress";
+import { useUploadThing } from "@/lib/uploadthing";
+import { useToast } from "./ui/use-toast";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const UploadDropzone = () => {
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-
+  const router = useRouter();
+  const { startUpload } = useUploadThing("pdfUploader");
+  const { toast } = useToast();
   const startSimulatedProgress = () => {
     setUploadProgress(0);
     const interval = setInterval(() => {
@@ -33,6 +39,25 @@ const UploadDropzone = () => {
         const progressInerval = startSimulatedProgress();
 
         // handle file uploading
+        const res = await startUpload(acceptedFile);
+        if (!res) {
+          return toast({
+            title: "Ooops!! something went wrong!",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+        const [fileResponse] = res;
+        const key = fileResponse?.key;
+
+        if (!key) {
+          return toast({
+            title: "Ooops!! something went wrong!",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 3000));
         clearInterval(progressInerval);
         setUploadProgress(100);
@@ -76,6 +101,12 @@ const UploadDropzone = () => {
                   />
                 </div>
               ) : null}
+              <input
+                type="file"
+                id="dropzone-file"
+                className="hidden"
+                {...getInputProps()}
+              />
             </label>
           </div>
         </div>

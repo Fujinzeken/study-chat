@@ -17,11 +17,9 @@ const DashboardPage = () => {
 
   const handleDelete = async (id: string) => {
     setFileToDelete(id);
+
     try {
-      const res = await axios.delete("http://localhost:3000/api/files/delete", {
-        //@ts-ignore
-        fileId: id,
-      });
+      const res = await axios.delete(`http://localhost:3000/api/files/${id}`);
       getUserFiles();
       setIsLoading(false);
       setFileToDelete("");
@@ -46,7 +44,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    // getUserFiles();
+    getUserFiles();
   }, []);
   return (
     <main className="mx-auto max-w-7xl md:p-10">
@@ -73,11 +71,11 @@ const DashboardPage = () => {
                 key={file?.id}
                 className="relative cols-span-1 bg-white divide-y divide-gray-200 rounded-lg shadow transition hover:shadow-lg"
               >
-                {fileToDelete === file.id && (
+                {/* {fileToDelete === file.id && (
                   <div className="w-full h-full bg-black opacity-40 justify-center items-center flex z-50 absolute top-0 left-0">
                     <Loader2 className="h-14 w-14 animate-spin" color="blue" />
                   </div>
-                )}
+                )} */}
                 <Link href={`/dashboard/${file?.id}`} className="">
                   <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
                     <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />

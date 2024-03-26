@@ -3,11 +3,11 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "@/db";
 import { NextResponse } from "next/server";
 
-export const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
+export const Get = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
-    const { fileId } = req.body;
+    const { key } = req.body;
     if (!user) {
       return NextResponse.json({
         status: 401,
@@ -17,26 +17,18 @@ export const DELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const file = await db.file.findFirst({
       where: {
-        id: fileId,
+        key,
+        userId: user.id,
       },
     });
 
     if (!file) {
       return NextResponse.json({
-        error: "Cannot find file with given file id",
+        status: 404,
+        error: "Cannot find file with given key",
       });
     }
-    if (user.id !== file?.userId) {
-      return NextResponse.json({
-        error:
-          "User is not Authorized, cannot delete file belonging to someone else!",
-      });
-    }
-    await db.file.delete({
-      where: {
-        id: fileId,
-      },
-    });
+
     return NextResponse.json(file);
   } catch (err: any) {
     console.error("An error occurred:", err);

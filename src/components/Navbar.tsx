@@ -19,7 +19,7 @@ const Navbar = () => {
           <div className="hidden items-center space-x-4 sm:flex">
             <Link href="/pricing">
               <Button size="sm" variant="ghost">
-                Pricing
+                Price
               </Button>
             </Link>
             <LoginLink>
